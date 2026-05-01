@@ -1,1 +1,93 @@
-<iframe src="https://movie-box.co" width="100%" height="600"></iframe>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Video Player</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial;
+    }
+
+    h2 {
+      padding: 15px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      padding: 15px;
+    }
+
+    .card {
+      background: #1f1f1f;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .info {
+      padding: 10px;
+    }
+
+    .title {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .desc {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .player {
+      width: 100%;
+      height: 300px;
+      background: black;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>My Video Hub</h2>
+
+<!-- VIDEO PLAYER -->
+<video id="player" class="player" controls></video>
+
+<!-- VIDEO CARDS -->
+<div class="container">
+
+  <div class="card" onclick="playVideo()">
+    <img src="https://via.placeholder.com/300x150">
+    <div class="info">
+      <div class="title">My Movie</div>
+      <div class="desc">Click to play video</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+const videoURL = "https://v.inmoviebox.com/qbJ4OsHJTI1";
+
+function playVideo() {
+  const player = document.getElementById("player");
+  player.src = videoURL;
+  player.play();
+}
+
+</script>
+
+</body>
+  </html>
