@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Hub</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f0f0f;
+      color: white;
+      margin: 0;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+
+    .card {
+      background: #1f1f1f;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .info {
+      padding: 10px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .desc {
+      font-size: 13px;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2 style="padding: 15px;">My Video Hub</h2>
+
+<div class="container" id="videos"></div>
+
+<script>
+const links = [
+  "https://movie-box.co",
+  "https://movie-box.org"
+];
+
+// Proxy to bypass CORS
+const proxy = "https://api.allorigins.win/get?url=";
+
+async function fetchMeta(url) {
+  try {
+    const res = await fetch(proxy + encodeURIComponent(url));
+    const data = await res.json();
+    const html = data.contents;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    const title = doc.querySelector("meta[property='og:title']")?.content || "No Title";
+    const desc = doc.querySelector("meta[property='og:description']")?.content || "No Description";
+    const img = doc.querySelector("meta[property='og:image']")?.content || "";
+
+    return { title, desc, img, url };
+
+  } catch (e) {
+    console.log("Error:", e);
+    return null;
+  }
+}
+
+async function loadVideos() {
+  const container = document.getElementById("videos");
+
+  for (let link of links) {
+    const data = await fetchMeta(link);
+    if (!data) continue;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <img src="${data.img}">
+      <div class="info">
+        <div class="title">${data.title}</div>
+        <div class="desc">${data.desc}</div>
+      </div>
+    `;
+
+    card.onclick = () => window.open(data.url, "_blank");
+
+    container.appendChild(card);
+  }
+}
+
+loadVideos();
+</script>
+
+</body>
+</html>
