@@ -2,19 +2,24 @@
 <html>
 <head>
   <title>Video Hub</title>
+
   <style>
     body {
-      font-family: Arial;
+      margin: 0;
       background: #0f0f0f;
       color: white;
-      margin: 0;
+      font-family: Arial;
+    }
+
+    h2 {
+      padding: 15px;
     }
 
     .container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 15px;
-      padding: 20px;
+      padding: 15px;
     }
 
     .card {
@@ -22,16 +27,11 @@
       border-radius: 10px;
       overflow: hidden;
       cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
     }
 
     img {
       width: 100%;
-      height: 180px;
+      height: 150px;
       object-fit: cover;
     }
 
@@ -40,12 +40,12 @@
     }
 
     .title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: bold;
     }
 
     .desc {
-      font-size: 13px;
+      font-size: 12px;
       color: #aaa;
     }
   </style>
@@ -53,65 +53,52 @@
 
 <body>
 
-<h2 style="padding: 15px;">My Video Hub</h2>
+<h2>My Video Hub</h2>
 
-<div class="container" id="videos"></div>
+<div class="container" id="container"></div>
 
 <script>
+
 const links = [
-  "https://movie-box.co",
-  "https://movie-box.org"
+  "https://openai.com",
+  "https://github.com",
+  "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ];
 
-// Proxy to bypass CORS
-const proxy = "https://api.allorigins.win/get?url=https://movie-box.co";
+// FREE metadata API
+const API = "https://jsonlink.io/api/extract?url=";
 
-async function fetchMeta(url) {
-  try {
-    const res = await fetch(proxy + encodeURIComponent(url));
-    const data = await res.json();
-    const html = data.contents;
+async function load() {
+  const container = document.getElementById("container");
 
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
+  for (let url of links) {
+    try {
+      let res = await fetch(API + encodeURIComponent(url));
+      let data = await res.json();
 
-    const title = doc.querySelector("meta[property='og:title']")?.content || "No Title";
-    const desc = doc.querySelector("meta[property='og:description']")?.content || "No Description";
-    const img = doc.querySelector("meta[property='og:image']")?.content || "";
+      let card = document.createElement("div");
+      card.className = "card";
 
-    return { title, desc, img, url };
+      card.innerHTML = `
+        <img src="${data.images[0] || 'https://via.placeholder.com/300'}">
+        <div class="info">
+          <div class="title">${data.title || 'No title'}</div>
+          <div class="desc">${data.description || 'No description'}</div>
+        </div>
+      `;
 
-  } catch (e) {
-    console.log("Error:", e);
-    return null;
+      card.onclick = () => window.open(url, "_blank");
+
+      container.appendChild(card);
+
+    } catch (e) {
+      console.log("Error:", e);
+    }
   }
 }
 
-async function loadVideos() {
-  const container = document.getElementById("videos");
+load();
 
-  for (let link of links) {
-    const data = await fetchMeta(link);
-    if (!data) continue;
-
-    const card = document.createElement("div");
-    card.className = "card";
-
-    card.innerHTML = `
-      <img src="${data.img}">
-      <div class="info">
-        <div class="title">${data.title}</div>
-        <div class="desc">${data.desc}</div>
-      </div>
-    `;
-
-    card.onclick = () => window.open(data.url, "_blank");
-
-    container.appendChild(card);
-  }
-}
-
-loadVideos();
 </script>
 
 </body>
